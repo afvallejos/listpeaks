@@ -1,0 +1,25 @@
+#!/bin/bash
+###########################################################
+#
+# (c) 2020 Adams Vallejos <adams.vallejos@gu.se>
+#
+###########################################################
+# This script is used to list peaks above many rms values
+# in difference maps using PEAKMAX(CCP4), that can be used
+# to analyze histograms in matlab as pdbread(*.pdb).
+# USAGE: bash list-peaks
+###########################################################
+mkdir -p output
+for i in `ls input/*.map | cut -f 2 -d '/' | cut -f 1 -d '.'`
+do 
+	echo "Searching peaks in:"$i.map
+for rms in 0 1 2 3
+do
+	echo "Saving peaks with rms >="$rms
+peakmax MAPIN input/$i XYZOUT output/$i-rms$rms.pdb << END > output/$i-rms$rms.log
+THRESHOLD RMS NEGATIVES $rms
+NUMPEAKS 8000
+END
+done
+done
+echo "Job finished!"
